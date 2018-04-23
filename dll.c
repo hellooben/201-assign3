@@ -22,6 +22,7 @@ struct dll //the doubly linked list structure
     int size;
     void (*display)(void *, FILE *);
     void (*free)(void *);
+    struct node *iterator;
 };
 
 extern DLL *
@@ -33,10 +34,11 @@ newDLL(void (*d)(void *,FILE *),void (*f)(void *)) { //constructor for the doubl
     items->size = 0;
     items->display = d;
     items->free = f;
+    items->iterator = NULL;
     return items;
 }
 
-extern void
+extern void *
 insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the doubly linked list, based on a given index
     assert(index >= 0 && index <= items->size);
     struct node *new = malloc(sizeof(node));
@@ -47,7 +49,7 @@ insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the
         items->head = new;
         items->tail = new;
         items->size ++;
-        return;
+        return new;
     }
     else if (index == 0) {
         struct node *current = items->head;
@@ -57,7 +59,7 @@ insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the
         current->prev = new;
         items->head = new;
         items->size ++;
-        return;
+        return new;
     }
     else if (index == items->size) {
         struct node *current = items->tail;
@@ -81,7 +83,7 @@ insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the
         new->next = current;
         currprev->next = new;
         items->size ++;
-        return;
+        return new;
     }
     else {
         struct node *current = items->head;
@@ -95,7 +97,7 @@ insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the
         new->prev = current;
         currnext->prev = new;
         items->size ++;
-        return;
+        return new;
     }
 }
 
@@ -327,4 +329,76 @@ freeDLL(DLL *items) { //frees each node's data, the node itself, and the linked 
         return;
     }
     return;
+}
+
+/*------------------- New Functions --------------------*/
+
+extern void
+removeDLLall(DLL *items) {
+    struct node *temp = items->head;
+    while (temp) {
+        struct node *freeable = temp;
+        temp = temp->next;
+        free(freeable);
+    }
+    items->head = 0;
+    items->tail = 0;
+    items->size = 0;
+    return;
+}
+
+extern void *
+removeDLLnode(DLL *items, void *value) {
+    struct node *node = value;
+    struct node *p = node->prev;
+    struct node *n = node->next;
+
+    node->prev = 0;
+    node->next = 0;
+    p->next = n;
+    n->prev = p;
+    items->size --;
+
+    return node;
+}
+
+extern void
+firstDLL(DLL *items) {
+    items->iterator = items->head;
+    return;
+}
+
+extern void
+lastDLL(DLL *items) {
+    items->iterator = items->tail;
+    return;
+}
+
+extern int
+moreDLL(DLL *items) {
+    if (items->iterator) {return 1;}
+    else {return 0;}
+}
+
+extern void
+nextDLL(DLL *items) {
+    struct node *it = items->iterator;
+    it = it->next;
+    return;
+}
+
+extern void
+prevDLL(DLL *items) {
+    struct node *it = items->iterator;
+    it = it->prev;
+    return;
+}
+
+extern void *
+currentDLL(DLL *items) {
+    struct node *it = items->iterator;
+    if (it) {
+        return it->data;
+    }
+    else {return NULL;}
 }
