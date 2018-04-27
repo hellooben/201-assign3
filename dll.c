@@ -353,6 +353,9 @@ removeDLLnode(DLL *items, void *value) {
     struct node *p = node->prev;
     struct node *n = node->next;
 
+    if (node->prev == NULL) {
+        items->head = n;
+    }
     node->prev = 0;
     node->next = 0;
     p->next = n;

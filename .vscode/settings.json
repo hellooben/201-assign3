@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "algorithm": "c",
+        "binomial.h": "c",
+        "__split_buffer": "c",
+        "deque": "c",
+        "initializer_list": "c",
+        "queue": "c",
+        "utility": "c",
+        "vector": "c"
+    }
+}
