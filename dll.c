@@ -351,34 +351,48 @@ removeDLLall(DLL *items) {
 
 extern void *
 removeDLLnode(DLL *items, void *value) {
-    printf("\nIN REMOVE DLLNODE\n");
+    // printf("\nIN REMOVE DLLNODE\nNODE IS: ");
     struct node *node = value;
-    struct node *p = node->prev;
-    struct node *n = node->next;
-    printf("made the other nodes\n");
+    // items->display(node->data, stdout);
+    // printf("\n");
 
-    if (node == items->head) {
-        printf("node->prev == NULL\n");
-        items->head = n;
+    if (items->size == 1) {
+        printf("Size is 1\n");
+        items->head = 0;
+        items->tail = 0;
+        node->next = 0;
+        node->prev = 0;
+        items->size --;
+        return node->data;
     }
-    if (node == items->tail) {
-        printf("node->next == NULL\n");
-        items->tail = p;
-    }
-    node->prev = 0;
-    node->next = 0;
-    if (p) {
-        printf("previous is NULL\n");
-        p->next = n;
-    }   
-    if (n) {
-        printf("next is NULL\n");
-        n->prev = p;
-    }
-    items->size --;
+    else {
+        struct node *p = node->prev;
+        struct node *n = node->next;
+        // printf("made the other nodes\n");
 
-    printf("returning the data\n");
-    return node->data;
+        if (node == items->head) {
+            // printf("node->prev == NULL\n");
+            items->head = n;
+        }
+        if (node == items->tail) {
+            // printf("node->next == NULL\n");
+            items->tail = p;
+        }
+        node->prev = 0;
+        node->next = 0;
+        if (p) {
+            // printf("previous is NOT NULL\n");
+            p->next = n;
+        }   
+        if (n) {
+            // printf("next is NOT NULL\n");
+            n->prev = p;
+        }
+        items->size --;
+
+        // printf("returning the data with DLL size %d\n", items->size);
+        return node->data;
+    }
 }
 
 extern void
@@ -403,14 +417,29 @@ moreDLL(DLL *items) {
 extern void
 nextDLL(DLL *items) {
     struct node *it = items->iterator;
-    it = it->next;
+    if (it->next == NULL) {
+        items->iterator = NULL;
+    }
+    else {
+        it = it->next;
+        items->iterator = it;
+    }
     return;
 }
 
 extern void
 prevDLL(DLL *items) {
     struct node *it = items->iterator;
-    it = it->prev;
+    if (it->prev == NULL) {
+        // printf("setting null\n");
+        items->iterator = NULL;
+    }
+    else {
+        // printf("setting a prev\n");
+        it = it->prev;
+        items->iterator = it;
+    }
+    // printf("returning from prevDLL\n");
     return;
 }
 
