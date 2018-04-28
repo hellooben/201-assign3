@@ -1,8 +1,8 @@
-OBJS = integer.o real.o string.o sll.o dll.o dll-*-*.o binomial-*-*.o binomial.o
+OBJS = integer.o real.o string.o sll.o dll.o queue.o dll-*-*.o binomial-*-*.o binomial.o
 OPTS = -Wall -Wextra -std=c99
 EXECS = test-dll test-binomial
-EXTRAS = integer.c real.c string.c
-OEXTRAS = integer.o real.o string.o
+EXTRAS = integer.c real.c string.c queue.c sll.c
+OEXTRAS = integer.o real.o string.o queue.o sll.o
 # EXTRAS = integer.c real.c string.c sll.c dll.c stack.c queue.c
 # OEXTRAS = integer.o real.o string.o sll.o dll.o stack.o queue.o
 

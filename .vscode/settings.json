@@ -8,5 +8,6 @@
         "queue": "c",
         "utility": "c",
         "vector": "c"
-    }
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

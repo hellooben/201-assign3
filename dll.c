@@ -276,11 +276,13 @@ extern void
 displayDLL(DLL *items,FILE *fp) { //displays the doubly linked list as an array
     printf("{{");
     struct node *current = items->head;
-    while (current != NULL) {
+    int x = 0;
+    while (x < sizeDLL(items)) {
         items->display(current->data, fp);
         if (current == items->tail) {break;}
         if (current->next != NULL) {printf(",");}
         current = current->next;
+        x ++;
     }
     printf("}}");
     return;
@@ -349,28 +351,40 @@ removeDLLall(DLL *items) {
 
 extern void *
 removeDLLnode(DLL *items, void *value) {
+    printf("\nIN REMOVE DLLNODE\n");
     struct node *node = value;
     struct node *p = node->prev;
     struct node *n = node->next;
+    printf("made the other nodes\n");
 
-    if (node->prev == NULL) {
+    if (node == items->head) {
+        printf("node->prev == NULL\n");
         items->head = n;
     }
-    if (node->next == NULL) {
+    if (node == items->tail) {
+        printf("node->next == NULL\n");
         items->tail = p;
     }
     node->prev = 0;
     node->next = 0;
-    p->next = n;
-    n->prev = p;
+    if (p) {
+        printf("previous is NULL\n");
+        p->next = n;
+    }   
+    if (n) {
+        printf("next is NULL\n");
+        n->prev = p;
+    }
     items->size --;
 
+    printf("returning the data\n");
     return node->data;
 }
 
 extern void
 firstDLL(DLL *items) {
     items->iterator = items->head;
+    // items->display()
     return;
 }
 
