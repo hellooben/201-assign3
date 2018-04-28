@@ -69,7 +69,7 @@ insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the
         new->next = NULL;
         items->tail = new;
         items->size ++;
-        return;
+        return new;
     }
     else if (index >= items->size/2 && items->size > 20) {
         struct node *current = items->tail;
@@ -356,13 +356,16 @@ removeDLLnode(DLL *items, void *value) {
     if (node->prev == NULL) {
         items->head = n;
     }
+    if (node->next == NULL) {
+        items->tail = p;
+    }
     node->prev = 0;
     node->next = 0;
     p->next = n;
     n->prev = p;
     items->size --;
 
-    return node;
+    return node->data;
 }
 
 extern void
