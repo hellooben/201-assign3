@@ -1,31 +1,26 @@
 #include "binomial.h"
 #include "dll.h"
-#include "avl.h"
+// #include "avl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-/*------------------- Auxiliary/Structure Function Definitions --------------------*/
+/*------------------- BNODE Structure and Functions --------------------*/
 
-BNODE *newBNODE(void (*display)(void *,FILE *),int (*compare)(void *,void *), void (*free)(void *),void *v);
-void consolidate(BINOMIAL *);
-void updateConsolidationArray(BINOMIAL *,void *[],BNODE *);
-BNODE *combine(BINOMIAL *, BNODE *, BNODE *);
-void *bubbleUp(BINOMIAL *, void *);
+typedef struct bnode BNODE;
 
-/*------------------- Structures --------------------*/
-
-typedef struct bnode
+struct bnode
 {
     void *key;
     BNODE *parent;
     DLL *children;
+    struct node *owner;
     // BNODE *rightSibling;
-    int degree;
-    // void (*display)(void *,FILE *);          //display
-    // int (*compare)(void *,void *);           //comparator
-    // void (*free)(void *);                    //free
-} BNODE;
+    // int degree;
+    void (*display)(void *,FILE *);          //display
+    int (*compare)(void *,void *);           //comparator
+    void (*free)(void *);                    //free
+};
 
 BNODE *newBNODE(
 void (*display)(void *,FILE *),
@@ -36,9 +31,39 @@ void *value) {
     new->key = value;
     new->parent = NULL;
     new->children = newDLL(display, free);
-    new->degree = 0;
+    // new->degree = 0;
+    new->display = display;
+    new->compare = compare;
+    new->free = free;
     return new;
 }
+
+void *getBNODEkey(BNODE *node) {
+    return node->key;
+}
+
+void *getBNODEowner(BNODE *node) {
+    return node->owner;
+}
+
+void setBNODEparent(BNODE *node, void *val) {
+    node->parent = val;
+}
+
+/*------------------- Auxiliary/Structure Function Definitions --------------------*/
+
+void update(void *,void *);
+BNODE *newBNODE(void (*display)(void *,FILE *),int (*compare)(void *,void *), void (*free)(void *),void *v);
+void *getBNODEkey(BNODE *);
+void *getBNODEowner(BNODE *);
+void setBNODEparent(BNODE *,void *);
+void consolidate(BINOMIAL *);
+void updateConsolidationArray(BINOMIAL *,void *[],BNODE *);
+BNODE *combine(BINOMIAL *, BNODE *, BNODE *);
+void *bubbleUp(BINOMIAL *, void *);
+void swapValues(BNODE *, BNODE *);
+
+/*------------------- Binomial Struct --------------------*/
 
 struct binomial
 {
@@ -48,7 +73,7 @@ struct binomial
     void (*display)(void *,FILE *);          //display
     int (*compare)(void *,void *);           //comparator
     void (*free)(void *);                    //free
-    void (*update)(void *,void *)            //update
+    void (*update)(void *,void *);           //update
 };
 
 /*------------------- Main Functions --------------------*/
@@ -75,6 +100,7 @@ insertBINOMIAL(BINOMIAL *b,void *value) {
     BNODE *new = newBNODE(b->display, b->compare, b->free, value);
     new->parent = new;
     insertDLL(b->rootList, 0, new);
+    new->owner = insertDLL(b->rootList, 0, new);
     b->size ++;
     consolidate(b);
     return new;
@@ -98,13 +124,48 @@ unionBINOMIAL(BINOMIAL *recipient, BINOMIAL *donor) {
 //TODO
 extern void 
 deleteBINOMIAL(BINOMIAL *b, void *node) {
-
+    decreaseKeyBINOMIAL(b, node, NULL);
+    extractBINOMIAL(b);
 }
 
 //TODO
 extern void 
 decreaseKeyBINOMIAL(BINOMIAL *b,void *node,void *value) {
+    BNODE *n = node;
+    n->key = value;
+    n = bubbleUp(b, n);
+    if (b->compare(n->key, getBNODEkey(b->extreme)) < 0) {
+        b->extreme = n;
+    }
+}
 
+extern void *
+peekBINOMIAL(BINOMIAL *b) {
+    if (b->extreme) {
+        return getBNODEkey(b->extreme);
+    }
+    else {return NULL;}
+}
+
+extern void *
+extractBINOMIAL(BINOMIAL *b) {
+    BNODE *y = b->extreme;
+    y = removeDLLnode(b->rootList, getBNODEowner(y));
+    DLL *list = y->children;
+    firstDLL(list);
+    for (int i=0; i<sizeDLL(list); i++) {
+        setBNODEparent(currentDLL(list), currentDLL(list));
+        nextDLL(list);
+    }
+    unionDLL(b->rootList, list);
+    consolidate(b);
+    b->size --;
+    return y->key;
+}
+
+extern void 
+statisticsBINOMIAL(BINOMIAL *b,FILE *fp) {
+    
 }
 
 /*------------------- Auxiliary Functions --------------------*/
@@ -121,7 +182,7 @@ void consolidate(BINOMIAL *b) {
     firstDLL(list);
     while (moreDLL(list) == 1) {
         BNODE *spot = currentDLL(list);
-        spot = removeDLLnode(list, spot);
+        spot = removeDLLnode(list, getBNODEowner(spot));
         updateConsolidationArray(b, array, spot);
         i++;
         firstDLL(list);
@@ -132,7 +193,7 @@ void consolidate(BINOMIAL *b) {
         if (array[i] != NULL) {
             insertDLL(list, 0, array[i]);
             if (b->extreme != NULL) {
-                if (b->compare(b->extreme, array[i]) > 0) {
+                if (b->compare(getBNODEkey(b->extreme), getBNODEkey(array[i])) > 0) {
                     b->extreme = array[i];
                 }
             }
@@ -145,7 +206,7 @@ void updateConsolidationArray(BINOMIAL *b, void *array[], BNODE *node) {
     int degree = sizeDLL(node->children);
     while (array[degree] != NULL) {
         node = combine(b, node, array[degree]);
-        array[degree] == NULL;
+        array[degree] = NULL;
         degree ++;
     }
     array[degree] = node;
@@ -171,10 +232,29 @@ void *bubbleUp(BINOMIAL *b, void *node) {
     if (n == p) {
         return n;
     }
-    if (b->compare(n->key, p->key) >= 0) {
+    else if (b->compare(n->key, p->key) >= 0) {
         return n;
     }
-    if (b->update) {
-
+    else {
+        if (b->update) {
+            update(n, p);
+        }
+        swapValues(n, p);
+        return bubbleUp(b, p);
     }
+}
+
+void update(void *node, void *parent) {
+    BNODE *n = node;
+    BNODE *p = parent;
+    struct node *pOwner = p->owner;
+
+    p->owner = n->owner;
+    n->owner = pOwner;
+}
+
+void swapValues(BNODE *n1, BNODE *n2) {
+    void *temp = n1->key;
+    n1->key = n2->key;
+    n2->key = temp;
 }
