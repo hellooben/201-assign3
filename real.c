@@ -39,10 +39,18 @@ displayREAL(void *v,FILE *fp)
     }
 
 int
-compareREAL(void *v,void *w)
-    {
-    return getREAL(v) - getREAL(w);
-    }
+compareREAL(void *v,void *w) {
+    if (getREAL(v) > getREAL(w)) {return 1;}
+    else if (getREAL(w) > getREAL(v)) {return -1;}
+    else {return 0;}
+}
+
+int
+rcompareREAL(void *v,void *w) {
+    if (getREAL(v) > getREAL(w)) {return -1;}
+    else if (getREAL(w) > getREAL(v)) {return 1;}
+    else {return 0;}
+}
 
 void
 freeREAL(void *v)

@@ -29,6 +29,6 @@ main(void)
         displayBINOMIALdebug(p,stdout);
         }
     printf("size is %d\n",sizeBINOMIAL(p));
-    freeBINOMIAL(p);
+    // freeBINOMIAL(p);
     return 0;
     }

@@ -16,9 +16,9 @@ main(void)
     BINOMIAL *p = newBINOMIAL(displayINTEGER,compareINTEGER,0,freeINTEGER);
     printf("MIN HEAP\n");
     insertBINOMIAL(p,newINTEGER(0));
-    printf("inserted the first\n\n\n");
+    // printf("inserted the first\n\n\n");
     insertBINOMIAL(p,newINTEGER(1));
-    printf("inserted the second\n\n\n");
+    // printf("inserted the second\n\n\n");
     insertBINOMIAL(p,newINTEGER(2));
     insertBINOMIAL(p,newINTEGER(3));
     insertBINOMIAL(p,newINTEGER(4));
@@ -30,7 +30,7 @@ main(void)
     insertBINOMIAL(p,newINTEGER(10));
     insertBINOMIAL(p,newINTEGER(11));
     insertBINOMIAL(p,newINTEGER(12));
-    printf("INSERTED\n");
+    printf("INSERTED-------------------\n\n\n");
     displayBINOMIAL(p,stdout);
     printf("debug:\n");
     displayBINOMIALdebug(p,stdout);

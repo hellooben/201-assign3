@@ -2,6 +2,8 @@
 #include "dll.h"
 #include "queue.h"
 #include "stack.h"
+#include "vertex.h"
+#include "edge.h"
 // #include "avl.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +20,8 @@ struct bnode
     void *key;
     BNODE *parent;
     DLL *children;
-    struct node *owner;
+    // struct node *owner;
+    void *owner;
     // BNODE *rightSibling;
     // int degree;
     void (*display)(void *,FILE *);          //display
@@ -60,7 +63,7 @@ void *getBNODEowner(BNODE *node) {
     return node->owner;
 }
 
-void setBNODEparent(BNODE *node, void *val) {
+void setBNODEparent(BNODE *node, BNODE *val) {
     node->parent = val;
 }
 
@@ -71,9 +74,9 @@ BNODE *newBNODE(void (*display)(void *,FILE *),int (*compare)(void *,void *), vo
 
 void *getBNODEkey(BNODE *);
 void *getBNODEowner(BNODE *);
-void setBNODEparent(BNODE *,void *);
+void setBNODEparent(BNODE *,BNODE *);
 void consolidate(BINOMIAL *);
-void updateConsolidationArray(BINOMIAL *,void *[],BNODE *);
+void updateConsolidationArray(BINOMIAL *,BNODE **,BNODE *);
 BNODE *combine(BINOMIAL *, BNODE *, BNODE *);
 void *bubbleUp(BINOMIAL *, void *);
 void swapValues(BNODE *, BNODE *);
@@ -112,30 +115,31 @@ void (*free)(void *)) {
 
 extern void *
 insertBINOMIAL(BINOMIAL *b, void *value) {
-    printf("IN INSERT BINOMIAL!\n");
+    // printf("IN INSERT BINOMIAL!\n");
     BNODE *new = newBNODE(b->display, b->compare, b->free, value);
     new->parent = new;
     // insertDLL(b->rootList, 0, new);
     // printf("inserted into rootlist\n");
-    new->owner = insertDLL(b->rootList, 0, new);
+    void *temp = insertDLL(b->rootList, 0, new);
+    new->owner = temp;
     b->size ++;
     // printf("about to consolidate\n");
-    printf("Heap before Consolidate:\n");
-    displayBINOMIALdebug(b, stdout);
-    printf("\n");
+    // printf("Heap before Consolidate:\n");
+    // displayBINOMIALdebug(b, stdout);
+    // printf("\n");
     consolidate(b);
-    printf("Heap after consolidate: \n");
-    displayBINOMIALdebug(b, stdout);
-    printf("\n------------INSERTED------------\n\n");
+    // printf("Heap after consolidate: \n");
+    // displayBINOMIALdebug(b, stdout);
+    // printf("\n------------INSERTED------------\n\n");
     return new;
 }
 
-extern int 
+extern int
 sizeBINOMIAL(BINOMIAL *b) {
     return b->size;
 }
 
-extern void 
+extern void
 unionBINOMIAL(BINOMIAL *recipient, BINOMIAL *donor) {
     unionDLL(recipient->rootList, donor->rootList);
     recipient->size += donor->size;
@@ -146,14 +150,14 @@ unionBINOMIAL(BINOMIAL *recipient, BINOMIAL *donor) {
 }
 
 //TODO
-extern void 
+extern void
 deleteBINOMIAL(BINOMIAL *b, void *node) {
     decreaseKeyBINOMIAL(b, node, NULL);
     extractBINOMIAL(b);
 }
 
 //TODO
-extern void 
+extern void
 decreaseKeyBINOMIAL(BINOMIAL *b, void *node, void *value) {
     BNODE *n = node;
     n->key = value;
@@ -173,41 +177,55 @@ peekBINOMIAL(BINOMIAL *b) {
 
 extern void *
 extractBINOMIAL(BINOMIAL *b) {
-    printf("\nIN EXTRACT\n");
-    printf("Rootlist size: %d\nROOTLIST LOOKS LIKE: \n", sizeDLL(b->rootList));
-    displayDLLordered(b, b->rootList, stdout);
-    printf("\n");
-    
+    // printf("\nIN EXTRACT\n");
+    // printf("Rootlist size: %d\nROOTLIST LOOKS LIKE: \n", sizeDLL(b->rootList));
+    // displayDLLordered(b, b->rootList, stdout);
+    // printf("\n");
+
     BNODE *y = b->extreme;
-    printf("EXTREME: ");
-    b->display(y->key, stdout);
-    printf("\n");
-    struct node *owner = getBNODEowner(y);
-    
-    y = removeDLLnode(b->rootList, owner);
+    // printf("EXTREME: ");
+    // b->display(y->key, stdout);
+    // printf("\n");
+    // struct node *owner = getBNODEowner(y);
+
+    y = removeDLLnode(b->rootList, getBNODEowner(y));
     y->parent = NULL;
 
-    printf("ROOTLIST after remove: \n");
-    displayDLLordered(b, b->rootList, stdout);
-    printf("\n");
+    // printf("ROOTLIST after remove: \n");
+    // displayDLLordered(b, b->rootList, stdout);
+    // printf("\n");
 
     DLL *list = y->children;
-    printf("CHILD LIST: \n");
-    displayDLLordered(b, list, stdout);
+    // printf("CHILD LIST: \n");
+    // displayDLLordered(b, list, stdout);
+    // printf("\n");
     firstDLL(list);
     for (int i=0; i<sizeDLL(list); i++) {
         setBNODEparent(currentDLL(list), currentDLL(list));
         nextDLL(list);
     }
+    // printf("ROOTLIST right before Union: \n");
+    // displayDLLordered(b, b->rootList, stdout);
+    // printf("\n");
+    // printf("CHILD LIST right before union: \n");
+    // displayDLLordered(b, list, stdout);
+    // printf("\n");
+
+    // unionDLL(list, b->rootList);
+    // b->rootList = list;
     unionDLL(b->rootList, list);
-    printf("rootList after union: \n");
-    displayDLL(b->rootList, stdout);
+
+    // printf("rootList after union: \n");
+    // displayDLLordered(b, b->rootList, stdout);
     consolidate(b);
     b->size --;
+    y->parent = 0;
+    y->children = 0;
+    y->owner = 0;
     return y->key;
 }
 
-extern void 
+extern void
 statisticsBINOMIAL(BINOMIAL *b, FILE *fp) {
     fprintf(fp, "size: %d\nrootlist size: %d\n", b->size, sizeDLL(b->rootList));
     if (b->extreme != NULL) {
@@ -216,7 +234,7 @@ statisticsBINOMIAL(BINOMIAL *b, FILE *fp) {
     }
 }
 
-extern void 
+extern void
 displayBINOMIAL(BINOMIAL *b, FILE *fp) {
     // printf("\n\n\nIN DISPLAYYYYYY\nsize of rootList is: %d\n", sizeDLL(b->rootList));
     double x = log((double)b->size);
@@ -247,7 +265,7 @@ displayBINOMIAL(BINOMIAL *b, FILE *fp) {
     fprintf(fp, "\n");
 }
 
-extern void 
+extern void
 displayBINOMIALdebug(BINOMIAL *b, FILE *fp) {
     DLL *list = NULL;
     int x = 0;
@@ -262,7 +280,7 @@ displayBINOMIALdebug(BINOMIAL *b, FILE *fp) {
 
     // enqueue(oldq, b->rootList);
     push(stack, b->rootList);
-    
+
     while (x < b->size) {
         // int oldsize = sizeQUEUE(oldq);
         int oldsize = sizeSTACK(stack);
@@ -293,6 +311,7 @@ displayBINOMIALdebug(BINOMIAL *b, FILE *fp) {
             // list = dequeue(newq);
             list = pop(news);
             displayDLLordered(b, list, fp);
+            // displayDLL(list, fp);
             // enqueue(oldq, list);
             push(stack, list);
             // x ++;
@@ -302,7 +321,7 @@ displayBINOMIALdebug(BINOMIAL *b, FILE *fp) {
     // while (sizeQUEUE(oldq) > 0) {
     //     dequeue(oldq);
     // }
-    printf("\n");
+    // printf("\n");
     return;
 }
 
@@ -314,7 +333,8 @@ void consolidate(BINOMIAL *b) {
     DLL *list = b->rootList;
     // printf("Rootlist size is: %d\n", sizeDLL(list));
     // printf("Rootlist: ");
-    firstDLL(list);
+    // displayDLLordered(b, list, stdout);
+    // firstDLL(list);
     // for (int i=0; i<sizeDLL(list); i++) {
     // while (moreDLL(list) == 1) {
     //     BNODE *curr = currentDLL(list);
@@ -323,7 +343,7 @@ void consolidate(BINOMIAL *b) {
     //     nextDLL(list);
     // }
     // printf("\n");
-    
+
     double x = log((double)b->size);
     // printf("DOUBLE X: %f\n", x);
     double y = log(2.0);
@@ -331,28 +351,40 @@ void consolidate(BINOMIAL *b) {
     double result = x/y;
     // printf("result: %f\n", result);
     size = (int)result + 1;
-    
+
     // printf("BINOMIAL size is: %d\nD array size is: %d\nRootlist size is: %d\n", b->size, size, sizeDLL(b->rootList));
-    void* array[size];
+    BNODE **array = malloc(sizeof(BNODE *) * size);
     // printf("Created the array\n");
     for (int i=0; i<size; i++) {
         array[i] = NULL;
     }
 
     int i = 0;
-    firstDLL(list);
+    // firstDLL(list);
+    lastDLL(list);
     while (moreDLL(list) == 1) {
         // printf("in the while, moreDLL is %d\n", moreDLL(list));
         BNODE *spot = currentDLL(list);
-        // printf("SPOT using current: ");
+
+        // nextDLL(list);
+        prevDLL(list);
+        // printf("TRYING TO REMOVE: ");
         // b->display(spot->key, stdout);
         // printf("\n");
-        nextDLL(list);
-        printf("\nfrom CONSOLIDATE, ");
+        // printf("\nfrom CONSOLIDATE, ");
         spot = removeDLLnode(list, getBNODEowner(spot));
         // printf("SPOT after remove: ");
         // b->display(spot->key, stdout);
         // printf("\n");
+        // printf("Array before Consolidating: \n[");
+        // for (int i=0; i<size; i++) {
+        //     if (array[i]) {
+        //         b->display(getBNODEkey(array[i]), stdout);
+        //     }
+        //     else {printf("NULL");}
+        //     printf(" ");
+        // }
+        // printf("]\n");
         updateConsolidationArray(b, array, spot);
         i++;
         // nextDLL(list);
@@ -361,61 +393,86 @@ void consolidate(BINOMIAL *b) {
 
     b->extreme = NULL;
     // printf("Set extreme to null, about to go into for loop\n");
+    // printf("New array after each pass: \n");
     for (int i=0; i<size; i++) {
-        if (array[i] != NULL) {
+        BNODE *node = array[i];
+        if (node != NULL) {
             // printf("array[%d] is NOT NULL\nDLL size is %d\n", i, sizeDLL(list));
-            insertDLL(list, 0, array[i]);
+            void *temp = insertDLL(list, 0, node);
+            node->owner = temp;
+
             // printf("inserted DLL\n");
             if (b->extreme == NULL) {
+                // printf("extreme is NULL\n");
                 b->extreme = array[i];
             }
             else if (b->extreme != NULL) {
-                if (b->compare(getBNODEkey(b->extreme), getBNODEkey(array[i])) > 0) {
+                // printf("hello\nnodes are : ");
+                // b->display(getBNODEkey(b->extreme), stdout);
+                // printf(" and ");
+                // b->display(getBNODEkey(array[i]), stdout);
+                // printf("\n");
+                int res = b->compare(getBNODEkey(b->extreme), getBNODEkey(array[i]));
+                // printf("RESULT OF COMPARE : %d\n", res);
+                // if (b->compare(getBNODEkey(b->extreme), getBNODEkey(array[i])) > 0) {
+                if (res > 0) {
+                    // printf("Setting the extreme to : ");
+                    // b->display(getBNODEkey(array[i]), stdout);
+                    // printf("\n");
                     b->extreme = array[i];
                 }
             }
         }
+        // displayDLLordered(b, list, stdout);
+        // printf("\n");
     }
     // printf("made it out of the for loop\n");
-    // free(array);
+    free(array);
 }
 
-void updateConsolidationArray(BINOMIAL *b, void **array, BNODE *node) {
-    // printf("\nUPDATING CONSOLIDATION ARRAY\n");
+void updateConsolidationArray(BINOMIAL *b, BNODE **array, BNODE *node) {
+    // printf("UPDATING CONSOLIDATION ARRAY\n");
     int degree = sizeDLL(node->children);
     // printf("Degree: %d\n", degree);
 
     // if (array[degree]) {
-    //     // printf("WHATS UP TESTING THIS NULL BULLSHIT\n");
+    //     printf("WHATS UP TESTING THIS NULL BULLSHIT\n");
     //     printf("array[%d] = ", degree);
     //     b->display(node->key, stdout);
-    //     printf("\n");
+    //     printf("!\n");
     // }
+    // else {printf("array[%d] = NULL\n", degree);}
 
     while (array[degree]) {
-        // printf("array[%d] is NOT NULL: ", degree);
-       
+        // printf("array[%d] is NOT NULL\n", degree);
+
         node = combine(b, node, array[degree]);
         array[degree] = NULL;
         degree ++;
     }
-    
+
     array[degree] = node;
     // printf("array[%d] = ", degree);
     // b->display(node->key, stdout);
-    // printf("\nDONE UPDATING CONSOLIDATION ARRAY\n");
+    // printf("\nDONE UPDATING CONSOLIDATION ARRAY\n\n");
     return;
 }
 
 BNODE *combine(BINOMIAL *b, BNODE *n1, BNODE *n2) {
-    // printf("\nIN COMBINE\n");
-    if (b->compare(n1, n2) > 0) {
+    // printf("IN COMBINE\nCOMBINING ");
+    // b->display(n1->key, stdout);
+    // printf(" and ");
+    // b->display(n2->key, stdout);
+    // printf("\n");
+    if (b->compare(n1->key, n2->key) > 0) {
         // printf("N1: ");
         // b->display(n1->key, stdout);
         // printf(" going into N2: ");
         // b->display(n2->key, stdout);
         // printf("\n");
-        insertDLL(n2->children, 0, n1);
+        void *temp = insertDLL(n2->children, 0, n1);
+        // void *temp = insertDLL(n2->children, sizeDLL(n2->children), n1);
+        n1->owner = temp;
         n1->parent = n2;
         return n2;
     }
@@ -425,13 +482,14 @@ BNODE *combine(BINOMIAL *b, BNODE *n1, BNODE *n2) {
         // printf(" going into N1: ");
         // b->display(n1->key, stdout);
         // printf("\n");
-        insertDLL(n1->children, 0, n2);
+        void *temp = insertDLL(n1->children, 0, n2);
+        // void *temp = insertDLL(n1->children, sizeDLL(n1->children), n2);
+        n2->owner = temp;
         n2->parent = n1;
         return n1;
     }
 }
 
-//TODO
 void *bubbleUp(BINOMIAL *b, void *node) {
     BNODE *n = node;
     BNODE *p = n->parent;
@@ -443,20 +501,18 @@ void *bubbleUp(BINOMIAL *b, void *node) {
     }
     else {
         if (b->update) {
-            update(n, p);
+            update(n->key, p);
+            update(p->key, n);
         }
         swapValues(n, p);
         return bubbleUp(b, p);
     }
 }
 
+//TODO: OWNER IS A DLL NODE, NOT A BNODE
 void update(void *node, void *parent) {
-    BNODE *n = node;
-    BNODE *p = parent;
-    struct node *pOwner = p->owner;
-
-    p->owner = n->owner;
-    n->owner = pOwner;
+    VERTEX *p = node;
+    setVERTEXowner(p, parent);
 }
 
 void swapValues(BNODE *n1, BNODE *n2) {
@@ -466,19 +522,23 @@ void swapValues(BNODE *n1, BNODE *n2) {
 }
 
 void displayDLLordered(BINOMIAL *b, DLL *items, FILE *fp) {
+    if (sizeDLL(items) == 0) {
+        printf("{{}}");
+        return;
+    }
     printf("{{");
     lastDLL(items);
     BNODE *current = currentDLL(items);
-    BNODE *p = current->parent;
+    // BNODE *p = current->parent;
 
     while (moreDLL(items) == 1) {
-        
+
         b->display(current->key, fp);
-        if (p) {
-            printf("(");
-            b->display(p->key, stdout);
-            printf(")");
-        }
+        // if (p) {
+        //     printf("(");
+        //     b->display(p->key, stdout);
+        //     printf(")");
+        // }
         // printf("\n");
 
         prevDLL(items);
@@ -488,7 +548,7 @@ void displayDLLordered(BINOMIAL *b, DLL *items, FILE *fp) {
         //     printf("breaking\n");
         //     break;
         // }
-        
+
         current = currentDLL(items);
     }
     // printf("outside of thie loop\n");

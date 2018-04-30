@@ -45,6 +45,11 @@ compareSTRING(void *v,void *w)
     return strcmp(getSTRING((STRING *) v), getSTRING((STRING *) w));
     }
 
+int
+rcompareSTRING(void *v,void *w) {
+    return compareSTRING(w,v);
+}
+
 void
 freeSTRING(void *v)
     {

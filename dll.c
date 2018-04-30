@@ -52,11 +52,25 @@ insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the
         return new;
     }
     else if (index == 0) {
+        // printf("IN INSERTDLL, INSERTING AT THE FRONT\n");
         struct node *current = items->head;
+        // printf("current head: ");
+        // items->display(current->data, stdout);
+        // printf("\n");
         new->data = value;
+        // printf("node being inserted: ");
+        // items->display(new->data, stdout);
+        // printf("\n");
         new->next = current;
+        // printf("inserted node's new NEXT: ");
+        // items->display(current->data, stdout);
+        // printf("\n");
         new->prev = 0;
         current->prev = new;
+        // struct node *temp = current->prev;
+        // printf("old head's new PREV: ");
+        // items->display(temp->data, stdout);
+        // printf("\n");
         items->head = new;
         items->size ++;
         return new;
@@ -168,11 +182,12 @@ removeDLL(DLL *items,int index) { //removes a node from the doubly linked list, 
 
 extern void
 unionDLL(DLL *recipient,DLL *donor) { //merges two doubly linked lists. the first parameter is the list to be added to, and the second is the donor list
-    printf("\nIN UNION\n");
-    displayDLL(recipient, stdout);
-    printf("\n");
-    displayDLL(donor, stdout);
-    printf("\n");
+    // printf("\nIN UNION\n");
+    // displayDLL(recipient, stdout);
+    // printf("\n");
+    // displayDLL(donor, stdout);
+    // printf("\n");
+    // printf("whats up\n");
     struct node *donorHead = donor->head;
     struct node *recTail = recipient->tail;
 
@@ -191,6 +206,7 @@ unionDLL(DLL *recipient,DLL *donor) { //merges two doubly linked lists. the firs
     }
     else {
         recTail->next = donorHead;
+        donorHead->prev = recTail;
         recipient->tail = donor->tail;
         recipient->size += donor->size;
 
@@ -356,36 +372,63 @@ removeDLLall(DLL *items) {
 
 extern void *
 removeDLLnode(DLL *items, void *value) {
-    printf("\nIN REMOVE DLLNODE\nNODE IS: ");
+    // printf("\nIN REMOVE DLLNODE, size of DLL is %d\nNODE IS: ", sizeDLL(items));
     struct node *node = value;
-    items->display(node->data, stdout);
-    printf("\n");
+    // items->display(node->data, stdout);
+    // printf("\n");
+
+
+
+    // if (p != NULL) {
+    //     printf("Prev: ");
+    //     items->display(p->data, stdout);
+    //     printf("\n");
+    // }
+    // if (n != NULL) {
+    //     printf("Next: ");
+    //     items->display(n->data, stdout);
+    //     printf("\n");
+    // }
 
     if (items->size == 1) {
-        printf("Size is 1\n");
+        // printf("Size is 1\n");
         items->head = 0;
         items->tail = 0;
         node->next = 0;
         node->prev = 0;
         items->size --;
+        // printf("returning the data with DLL size %d\n", items->size);
+        // displayDLL(items, stdout);
+        // printf("\n");
         return node->data;
     }
     else {
         struct node *p = node->prev;
         struct node *n = node->next;
-        if (p) {
-            printf("Prev: ");
-            items->display(p->data, stdout);
-            printf("\n");
-        }
-        if (n) {
-            printf("Next: ");
-            items->display(n->data, stdout);
-            printf("\n");
-        }
-        printf("made the other nodes\n");
+        struct node *head = items->head;
+        struct node *tail = items->tail;
+        // if (p) {
+        //     printf("Prev: ");
+        //     items->display(p->data, stdout);
+        //     printf("\n");
+        // }
+        // else {printf("Prev is NULL\n");}
+        // if (n) {
+        //     printf("Next: ");
+        //     items->display(n->data, stdout);
+        //     printf("\n");
+        // }
+        // else {printf("Next is NULL\n");}
+        // printf("made the other nodes\n");
 
-        // if (node == items->head) {
+        if (node == head) {
+            // printf("setting the head\n");
+            items->head = n;
+        }
+        if (node == tail) {
+            // printf("setting the tail\n");
+            items->tail = p;
+        }
         // if (p == NULL) {
         //     printf("removing the head\n");
         //     items->head = n;
@@ -395,28 +438,33 @@ removeDLLnode(DLL *items, void *value) {
         //     printf("removing the tail\n");
         //     items->tail = p;
         // }
-        
+
         if (p) {
-            printf("previous is NOT NULL\n");
+            // printf("previous is NOT NULL\n");
             p->next = n;
-        }   
+        }
         if (n) {
-            printf("next is NOT NULL\n");
+            // printf("next is NOT NULL\n");
             n->prev = p;
         }
-        node->prev = 0;
-        node->next = 0;
+        node->prev = NULL;
+        node->next = NULL;
         items->size --;
 
         // printf("returning the data with DLL size %d\n", items->size);
+        // displayDLL(items, stdout);
+        // printf("\n");
         return node->data;
     }
 }
 
 extern void
 firstDLL(DLL *items) {
-    items->iterator = items->head;
-    // items->display()
+    // printf("Setting the iterator to: ");
+    struct node *head = items->head;
+    // items->display(head->data, stdout);
+    // printf("\n");
+    items->iterator = head;
     return;
 }
 
@@ -440,6 +488,9 @@ nextDLL(DLL *items) {
     }
     else {
         it = it->next;
+        // printf("Setting the iterator to: ");
+        // items->display(it->data, stdout);
+        // printf("\n");
         items->iterator = it;
     }
     return;
@@ -465,6 +516,9 @@ extern void *
 currentDLL(DLL *items) {
     struct node *it = items->iterator;
     if (it) {
+        // printf("Iterator is currently at: ");
+        // items->display(it->data, stdout);
+        // printf("\n");
         return it->data;
     }
     else {return NULL;}

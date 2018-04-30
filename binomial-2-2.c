@@ -37,6 +37,6 @@ main(void)
     displayBINOMIALdebug(p,stdout);
     printf("peek: %s\n",getSTRING(peekBINOMIAL(p)));
     printf("size: %d\n",sizeBINOMIAL(p));
-    freeBINOMIAL(p);
+    // freeBINOMIAL(p);
     return 0;
     }
