@@ -460,17 +460,31 @@ removeDLLnode(DLL *items, void *value) {
 
 extern void
 firstDLL(DLL *items) {
-    // printf("Setting the iterator to: ");
+    // printf("Setting the iterator to: \n");
     struct node *head = items->head;
     // items->display(head->data, stdout);
     // printf("\n");
-    items->iterator = head;
+    if (head!=NULL) {
+        items->iterator = head;
+    }
+    else {
+        items->iterator = NULL;
+    }
     return;
 }
 
 extern void
 lastDLL(DLL *items) {
-    items->iterator = items->tail;
+    // printf("Setting the iterator to: \n");
+    struct node *tail = items->tail;
+    // items->display(tail->data, stdout);
+    // printf("\n");
+    if (tail!=NULL) {
+        items->iterator = tail;
+    }
+    else {
+        items->iterator = NULL;
+    }
     return;
 }
 
