@@ -11,7 +11,7 @@ extern long int random(void);
 int
 main(void)
     {
-    srandom(2002);
+    srandom(2);
     //simple REAL test of BINOMIAL
     BINOMIAL *p = newBINOMIAL(displayREAL,compareREAL,0,freeREAL);
     printf("MIN HEAP\n");
@@ -37,6 +37,6 @@ main(void)
     displayBINOMIALdebug(p,stdout);
     printf("peek: %f\n",getREAL(peekBINOMIAL(p)));
     printf("size: %d\n",sizeBINOMIAL(p));
-    // freeBINOMIAL(p);
+    freeBINOMIAL(p);
     return 0;
     }

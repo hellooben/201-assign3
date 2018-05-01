@@ -65,7 +65,7 @@ insertDLL(DLL *items,int index,void *value) { //inserts a node anywhere into the
         // printf("inserted node's new NEXT: ");
         // items->display(current->data, stdout);
         // printf("\n");
-        new->prev = 0;
+        new->prev = NULL;
         current->prev = new;
         // struct node *temp = current->prev;
         // printf("old head's new PREV: ");
@@ -535,5 +535,8 @@ currentDLL(DLL *items) {
         // printf("\n");
         return it->data;
     }
-    else {return NULL;}
+    else {
+        // printf("ITERATOR IS NULL\n");
+        return NULL;
+    }
 }

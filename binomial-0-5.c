@@ -11,12 +11,12 @@ extern long int random(void);
 int
 main(void)
     {
-    srandom(2006);
+    srandom(6);
     //INTEGER test of BINOMIAL
     int i;
     BINOMIAL *p = newBINOMIAL(displayINTEGER,rcompareINTEGER,0,freeINTEGER);
     printf("MAX HEAP\n");
-    for (i = 0; i < 195; ++i)
+    for (i = 0; i < 141; ++i)
         {
         int j = random();
         INTEGER *a = newINTEGER(j);

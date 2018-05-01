@@ -11,12 +11,12 @@ extern long int random(void);
 int
 main(void)
     {
-    srandom(2009);
+    srandom(11);
     //INTEGER test of BINOMIAL
     int i;
     BINOMIAL *p = newBINOMIAL(displayINTEGER,rcompareINTEGER,0,freeINTEGER);
     printf("MAX HEAP\n");
-    for (i = 0; i < 1015; ++i)
+    for (i = 0; i < 101423; ++i)
         {
         int j = random();
         INTEGER *a = newINTEGER(j);
@@ -31,7 +31,7 @@ main(void)
         }
     printf("size is %d\n",sizeBINOMIAL(p));
     printf("extracting a bunch of values...\n");
-    for (i = 0; i < 1005; ++i)
+    for (i = 0; i < 101413; ++i)
         {
         if (sizeBINOMIAL(p) > 20 + random() % 10)
             {

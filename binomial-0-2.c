@@ -11,7 +11,7 @@ extern long int random(void);
 int
 main(void)
     {
-    srandom(2003);
+    srandom(3);
     //simple STRING test of BINOMIAL
     BINOMIAL *p = newBINOMIAL(displaySTRING,compareSTRING,0,freeSTRING);
     printf("MIN HEAP\n");
@@ -37,6 +37,6 @@ main(void)
     displayBINOMIALdebug(p,stdout);
     printf("peek: %s\n",getSTRING(peekBINOMIAL(p)));
     printf("size: %d\n",sizeBINOMIAL(p));
-    // freeBINOMIAL(p);
+    freeBINOMIAL(p);
     return 0;
     }
