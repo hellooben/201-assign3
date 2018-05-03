@@ -8,9 +8,10 @@
 #include "integer.h"
 #include "vertex.h"
 #include "edge.h"
+#include "dll.h"
 
 static void update(void *v,void *n);
-void MST-Prim(BINOMIAL *,AVL *,VERTEX *);
+void MST_Prim(BINOMIAL *,AVL *,VERTEX *);
 
 int main (int argc, char **argv) {
     FILE *data;
@@ -69,8 +70,8 @@ int main (int argc, char **argv) {
                 insertAVL(edges, ed);
                 VERTEX *one = newVERTEX(v1);
                 VERTEX *two = newVERTEX(v2);
-                void *find = findAVL(vertices, one);
-                void *find2 = findAVL(vertices, two);
+                VERTEX *find = findAVL(vertices, one);
+                VERTEX *find2 = findAVL(vertices, two);
 
                 if (find != NULL && find2 != NULL) {
                     one = find;
@@ -97,10 +98,14 @@ int main (int argc, char **argv) {
                     setVERTEXowner(two, t);
                 }
 
-                insertDLL(getVERTEXneighbors(one), sizeDLL(getVERTEXneighbors(one)), two);
-                insertDLL(getVERTEXweights(one), sizeDLL(getVERTEXweights(one)), newINTEGER(edge));
-                insertDLL(getVERTEXneighbors(two), sizeDLL(getVERTEXneighbors(two)), one);
-                insertDLL(getVERTEXweights(two), sizeDLL(getVERTEXweights(two)), newINTEGER(edge));
+                // insertDLL(getVERTEXneighbors(one), sizeDLL(getVERTEXneighbors(one)), two);
+                // insertDLL(getVERTEXweights(one), sizeDLL(getVERTEXweights(one)), newINTEGER(edge));
+                // insertDLL(getVERTEXneighbors(two), sizeDLL(getVERTEXneighbors(two)), one);
+                // insertDLL(getVERTEXweights(two), sizeDLL(getVERTEXweights(two)), newINTEGER(edge));
+                insertVERTEXneighbor(one, two);
+                insertVERTEXneighbor(two, one);
+                insertVERTEXweight(one, edge);
+                insertVERTEXweight(two, edge);
             }
 
             // printf("EDGE: %d\n", edge);
@@ -142,10 +147,14 @@ int main (int argc, char **argv) {
                     setVERTEXowner(two, t);
                 }
 
-                insertDLL(getVERTEXneighbors(one), sizeDLL(getVERTEXneighbors(one)), two);
-                insertDLL(getVERTEXweights(one), sizeDLL(getVERTEXweights(one)), newINTEGER(1));
-                insertDLL(getVERTEXneighbors(two), sizeDLL(getVERTEXneighbors(two)), one);
-                insertDLL(getVERTEXweights(two), sizeDLL(getVERTEXweights(two)), newINTEGER(1));
+                // insertDLL(getVERTEXneighbors(one), sizeDLL(getVERTEXneighbors(one)), two);
+                // insertDLL(getVERTEXweights(one), sizeDLL(getVERTEXweights(one)), newINTEGER(1));
+                // insertDLL(getVERTEXneighbors(two), sizeDLL(getVERTEXneighbors(two)), one);
+                // insertDLL(getVERTEXweights(two), sizeDLL(getVERTEXweights(two)), newINTEGER(1));
+                insertVERTEXneighbor(one, two);
+                insertVERTEXneighbor(two, one);
+                insertVERTEXweight(one, edge);
+                insertVERTEXweight(two, edge);
             }
         }
         // if (feof(data)) {printf("breaking\n");break;}
@@ -159,10 +168,10 @@ int main (int argc, char **argv) {
     displayAVL(edges, stdout);
     printf("\n");
     printf("Priority Queue looks like: \n");
-    displayBINOMIAL(bin, stdout);
+    displayBINOMIALdebug(bin, stdout);
     printf("\n");
 
-    MST-Prim(bin, weights, )
+    MST_Prim(bin, edges, rootVertex);
 
     return 0;
 }
@@ -173,5 +182,62 @@ static void
 update(void *v,void *n) {
     VERTEX *p = v;
     setVERTEXowner(p, n);
+    return;
+}
+
+void
+MST_Prim(BINOMIAL *b, AVL *e, VERTEX *root) {
+    printf("WELCOME TO PRIM\nBinomial:\n");
+    displayBINOMIALdebug(b, stdout);
+    printf("\n");
+    // decreaseKeyBINOMIAL(b, getVERTEXowner(root), newINTEGER(-1));
+    setVERTEXkey(root, 0);
+    decreaseKeyBINOMIAL(b, getVERTEXowner(root), root);
+    printf("Binomial, after decreasing root key:\n");
+    displayBINOMIALdebug(b, stdout);
+    printf("\n");
+    printf("sizeBINOMIAL: %d\n", sizeBINOMIAL(b));
+    while (sizeBINOMIAL(b) > 0) {
+
+        VERTEX *u = extractBINOMIAL(b);
+        printf("extracted\n");
+        displayVERTEX(u, stdout);
+        printf(" was just extracted.\nBinomial, after an extract min:\n");
+        displayBINOMIALdebug(b, stdout);
+        printf("\n");
+
+        setVERTEXflag(u, 1);
+        printf("The vertex flag was set to: %d\n", getVERTEXflag(u));
+
+        DLL *nbors = getVERTEXneighbors(u);
+        displayVERTEX(u, stdout);
+        printf("'s Neighbors: \n");
+        displayDLL(nbors, stdout);
+        printf("\n");
+
+        firstDLL(nbors);
+        int x = 0;
+
+        while (moreDLL(nbors)) {
+            printf("moreDLL returning true\nx:%d\n", x);
+            VERTEX *v = currentDLL(nbors);
+            printf("VERTEX under question: \n");
+            displayVERTEXdebug(v, stdout);
+            printf("\n");
+
+            int wght = getINTEGER(getDLL(getVERTEXweights(u), x));
+            printf("WGHT: %d\n", wght);
+            x++;
+
+            if (getVERTEXflag(v) == 0 && wght < getVERTEXkey(v)) {
+                printf("node isn't in the tree, and weight[x] < the current's key\n");
+                setVERTEXpred(v, u);
+                // decreaseKeyBINOMIAL(b, getVERTEXowner(v), newINTEGER(wght));
+                setVERTEXkey(v, wght);
+                decreaseKeyBINOMIAL(b, getVERTEXowner(v), v);
+            }
+            nextDLL(nbors);
+        }
+    }
     return;
 }

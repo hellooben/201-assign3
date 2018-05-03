@@ -161,14 +161,12 @@ unionBINOMIAL(BINOMIAL *recipient, BINOMIAL *donor) {
     consolidate(recipient);
 }
 
-//TODO
 extern void
 deleteBINOMIAL(BINOMIAL *b, void *node) {
     decreaseKeyBINOMIAL(b, node, NULL);
     extractBINOMIAL(b);
 }
 
-//TODO
 extern void
 decreaseKeyBINOMIAL(BINOMIAL *b, void *node, void *value) {
     BNODE *n = node;
