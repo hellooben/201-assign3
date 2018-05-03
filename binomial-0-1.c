@@ -40,3 +40,6 @@ main(void)
     freeBINOMIAL(p);
     return 0;
     }
+
+
+    //MISSING 2 FREES IN HERE

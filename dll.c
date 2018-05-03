@@ -374,21 +374,6 @@ extern void *
 removeDLLnode(DLL *items, void *value) {
     // printf("\nIN REMOVE DLLNODE, size of DLL is %d\nNODE IS: ", sizeDLL(items));
     struct node *node = value;
-    // items->display(node->data, stdout);
-    // printf("\n");
-
-
-
-    // if (p != NULL) {
-    //     printf("Prev: ");
-    //     items->display(p->data, stdout);
-    //     printf("\n");
-    // }
-    // if (n != NULL) {
-    //     printf("Next: ");
-    //     items->display(n->data, stdout);
-    //     printf("\n");
-    // }
 
     if (items->size == 1) {
         // printf("Size is 1\n");
@@ -397,29 +382,17 @@ removeDLLnode(DLL *items, void *value) {
         node->next = 0;
         node->prev = 0;
         items->size --;
-        // printf("returning the data with DLL size %d\n", items->size);
-        // displayDLL(items, stdout);
-        // printf("\n");
-        return node->data;
+
+        void *returnable = node->data;
+        free(node);
+
+        return returnable;
     }
     else {
         struct node *p = node->prev;
         struct node *n = node->next;
         struct node *head = items->head;
         struct node *tail = items->tail;
-        // if (p) {
-        //     printf("Prev: ");
-        //     items->display(p->data, stdout);
-        //     printf("\n");
-        // }
-        // else {printf("Prev is NULL\n");}
-        // if (n) {
-        //     printf("Next: ");
-        //     items->display(n->data, stdout);
-        //     printf("\n");
-        // }
-        // else {printf("Next is NULL\n");}
-        // printf("made the other nodes\n");
 
         if (node == head) {
             // printf("setting the head\n");
@@ -429,15 +402,6 @@ removeDLLnode(DLL *items, void *value) {
             // printf("setting the tail\n");
             items->tail = p;
         }
-        // if (p == NULL) {
-        //     printf("removing the head\n");
-        //     items->head = n;
-        // }
-        // // if (node == items->tail) {
-        // if (n == NULL) {
-        //     printf("removing the tail\n");
-        //     items->tail = p;
-        // }
 
         if (p) {
             // printf("previous is NOT NULL\n");
@@ -450,11 +414,13 @@ removeDLLnode(DLL *items, void *value) {
         node->prev = NULL;
         node->next = NULL;
         items->size --;
+        void *returnable = node->data;
+        free(node);
 
         // printf("returning the data with DLL size %d\n", items->size);
         // displayDLL(items, stdout);
         // printf("\n");
-        return node->data;
+        return returnable;
     }
 }
 

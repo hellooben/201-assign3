@@ -1,4 +1,4 @@
-OBJS = integer.o real.o string.o sll.o dll.o queue.o stack.o prim.o vertex.o edge.o bst.o avl.o dll-*-*.o binomial-*-*.o binomial.o
+OBJS = integer.o real.o string.o sll.o dll.o queue.o stack.o prim.o vertex.o edge.o bst.o avl.o scanner.o dll-*-*.o binomial-*-*.o binomial.o
 OPTS = -Wall -Wextra -std=c99
 EXECS = test-dll test-binomial
 EXTRAS = integer.c real.c string.c queue.c sll.c
@@ -17,12 +17,12 @@ test-dll :
 	gcc $(OPTS) dll-1-0.o integer.o dll.o -o test-dll
 
 test-binomial :
-	gcc $(OPTS) -c binomial.c dll.c $(EXTRAS) binomial-0-9.c
-	gcc $(OPTS) binomial-0-9.o $(OEXTRAS) dll.o binomial.o -o test-binomial
+	gcc $(OPTS) -c binomial.c dll.c $(EXTRAS) binomial-0-0.c
+	gcc $(OPTS) binomial-0-0.o $(OEXTRAS) dll.o binomial.o -o test-binomial -lm
 
 prim :
-	gcc $(OPTS) -c prim.c dll.c binomial.c vertex.c edge.c bst.c avl.c $(EXTRAS)
-	gcc $(OPTS) $(OEXTRAS) bst.o avl.o edge.o vertex.o dll.o binomial.o prim.o -o prim
+	gcc $(OPTS) -c prim.c dll.c binomial.c vertex.c edge.c bst.c avl.c scanner.c $(EXTRAS)
+	gcc $(OPTS) $(OEXTRAS) scanner.o bst.o avl.o edge.o vertex.o dll.o binomial.o prim.o -o prim
 
 valgrind :
 	echo testing doubly-linked list

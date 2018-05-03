@@ -56,3 +56,6 @@ main(void)
     freeBINOMIAL(p);
     return 0;
     }
+
+
+// MISSING 3 FREES IN HERE

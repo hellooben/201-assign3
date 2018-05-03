@@ -55,5 +55,8 @@ rcompareREAL(void *v,void *w) {
 void
 freeREAL(void *v)
     {
+        // printf("REAL FREEING: ");
+        // displayREAL(v, stdout);
+        // printf("\n");
     free((REAL *) v);
     }
