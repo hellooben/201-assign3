@@ -172,7 +172,15 @@ decreaseKeyBINOMIAL(BINOMIAL *b, void *node, void *value) {
     BNODE *n = node;
     n->key = value;
     n = bubbleUp(b, n);
+    // printf("comparing ");
+    // b->display(n->key, stdout);
+    // printf(" and ");
+    // b->display(getBNODEkey(b->extreme), stdout);
+    // printf("\n");
     if (b->compare(n->key, getBNODEkey(b->extreme)) < 0) {
+        // printf("setting DA extreme to ");
+        // b->display(n->key, stdout);
+        // printf("\n");
         b->extreme = n;
     }
 }
@@ -589,8 +597,8 @@ void *bubbleUp(BINOMIAL *b, void *node) {
     }
     else {
         if (b->update) {
-            update(n->key, p);
-            update(p->key, n);
+            b->update(n->key, p);
+            b->update(p->key, n);
         }
         swapValues(n, p);
         return bubbleUp(b, p);

@@ -131,15 +131,23 @@ compareVERTEX(void *a,void *b)
     VERTEX *y = b;
 
     dprintf("comparing vertex %d with vertex %d\n",x->number,y->number);
+    // printf("comparing vertex %d with vertex %d\n",x->number,y->number);
 
-    if (x->key == -1 && y->key != -1)
+    if (x->key == -1 && y->key != -1) {
+        // printf("both keys are -1\n");
         return 1;
-    else if (x->key != -1 && y->key == -1)
+    }
+    else if (x->key != -1 && y->key == -1) {
+        // printf("second one is -1\n");
         return -1;
-
+    }
     int r = x->key - y->key;
-    if (r == 0)
+    // printf("left - right: %d\n", r);
+    if (r == 0) {
+        // printf("r = 0, returning %d\n", x->number - y->number);
         return x->number - y->number;
+    }
+
     else
         return r;
     }

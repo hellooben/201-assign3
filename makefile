@@ -6,7 +6,7 @@ OEXTRAS = integer.o real.o string.o queue.o sll.o
 # EXTRAS = integer.c real.c string.c sll.c dll.c stack.c queue.c
 # OEXTRAS = integer.o real.o string.o sll.o dll.o stack.o queue.o
 
-all : test-dll test-binomial
+all : test-dll test-binomial prim
 
 # test-sll :
 # 	gcc $(OPTS) -c sll.c integer.c sll-0-0.c
@@ -22,7 +22,7 @@ test-binomial :
 
 prim :
 	gcc $(OPTS) -c prim.c dll.c binomial.c vertex.c edge.c bst.c avl.c scanner.c $(EXTRAS)
-	gcc $(OPTS) $(OEXTRAS) scanner.o bst.o avl.o edge.o vertex.o dll.o binomial.o prim.o -o prim
+	gcc $(OPTS) $(OEXTRAS) scanner.o bst.o avl.o edge.o vertex.o dll.o binomial.o prim.o -o prim -lm
 
 valgrind :
 	echo testing doubly-linked list
